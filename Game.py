@@ -41,6 +41,37 @@ def win_check():
     return
 
 
+def move_check(y,x):
+    try:
+        play_y_f = int(y)
+        try:
+            play_x_f = int(x)
+        except ValueError:
+            if x in x_dict:
+                play_x_f = int(x_dict[x])
+            else:
+                print("Invalid input")
+                move_validity = [0, 0, False]
+                return move_validity
+    except ValueError:
+        print("Invalid input")
+        move_validity = [0, 0, False]
+        return move_validity
+    if play_x_f <= 11 and play_y <= 9:
+        if board_game[play_y_f][play_x_f] != "( )":
+            print('Invalid Move')
+            move_validity = [0, 0, False]
+            return move_validity
+        else:
+            validmove_f = True
+            move_validity = [play_x_f, play_y_f, validmove_f]
+    else:
+        print('Invalid Move')
+        move_validity = [0, 0, False]
+        return move_validity
+    return move_validity
+
+
 # Variables below are used in the function
 # p_play variables are for getting user input
 play_x = 0
@@ -58,27 +89,11 @@ while moves != 30 or win is False:
     while validMove is False:
         p_play_x = input("enter X coordinate")
         p_play_y = input("enter Y coordinate")
-        try:
-            play_y = int(p_play_y)
-            try:
-                play_x = int(p_play_x)
-            except ValueError:
-                if p_play_x in x_dict:
-                    play_x = int(x_dict[p_play_x])
-                else:
-                    print("Invalid input")
-                    continue
-        except ValueError:
-            print("Invalid input")
-            continue
-        if play_x <= 11 and play_y <= 9:
-            if board_game[play_y][play_x] != "( )":
-                print('Invalid Move')
-            else:
-                validMove = True
-        else:
-            print('Invalid Move')
-
+        checker = move_check(p_play_y, p_play_x)
+        validMove = checker[2]
+        if validMove is True:
+            play_x = checker[0]
+            play_y = checker[1]
     if p1_turn is True:
         board_game[play_y][play_x] = "(X)"
         p1_turn = False
