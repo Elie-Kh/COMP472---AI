@@ -46,7 +46,7 @@ def win_check():
 play_x = 0
 play_y = 0
 p_play_x = 0
-y_dict = dict(A='0', B='1', C='2', D='3', E='4', F='5', G='6', H='7', I='8', J='9', K='10', L='11')
+x_dict = dict(A='0', B='1', C='2', D='3', E='4', F='5', G='6', H='7', I='8', J='9', K='10', L='11')
 p1_turn = True
 p1_tokens = 15
 p2_tokens = 15
@@ -59,22 +59,34 @@ while moves != 30 or win is False:
         p_play_x = input("enter X coordinate")
         p_play_y = input("enter Y coordinate")
         try:
-            play_x = int(p_play_x)
-            play_y = int(y_dict[p_play_y])
-            print(play_x, ' ', play_y)
+            play_y = int(p_play_y)
+            try:
+                play_x = int(p_play_x)
+            except ValueError:
+                if p_play_x in x_dict:
+                    play_x = int(x_dict[p_play_x])
+                else:
+                    print("Invalid input")
+                    continue
         except ValueError:
             print("Invalid input")
             continue
-        if board_game[play_x][play_y] != "( )" or play_x > 11 or play_y > 9:
-            print('invalid Move')
+        if play_x <= 11 and play_y <= 9:
+            if board_game[play_y][play_x] != "( )":
+                print('Invalid Move')
+            else:
+                validMove = True
         else:
-            validMove = True
+            print('Invalid Move')
 
     if p1_turn is True:
-        board_game[play_x][play_y] = "(X)"
+        board_game[play_y][play_x] = "(X)"
         p1_turn = False
     else:
-        board_game[play_x][play_y] = "(O)"
+        board_game[play_y][play_x] = "(O)"
         p1_turn = True
     validMove = False
+
+    # check for win here
+
     gameboard()
