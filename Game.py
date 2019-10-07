@@ -46,7 +46,7 @@ def win_check():
 play_x = 0
 play_y = 0
 p_play_x = 0
-p_play_y = 0
+y_dict = dict(A='0', B='1', C='2', D='3', E='4', F='5', G='6', H='7', I='8', J='9', K='10', L='11')
 p1_turn = True
 p1_tokens = 15
 p2_tokens = 15
@@ -60,7 +60,7 @@ while moves != 30 or win is False:
         p_play_y = input("enter Y coordinate")
         try:
             play_x = int(p_play_x)
-            play_y = int(p_play_y)
+            play_y = int(y_dict[p_play_y])
             print(play_x, ' ', play_y)
         except ValueError:
             print("Invalid input")
