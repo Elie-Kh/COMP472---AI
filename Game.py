@@ -57,7 +57,7 @@ def move_check(y,x,turn,moving):
         print("Invalid input")
         move_validity = [0, 0, False, False]
         return move_validity
-    if play_x_f <= 11 and play_y <= 9:
+    if play_x_f <= 11 and play_y_f <= 9:
         if board_game[play_y_f][play_x_f] != "( )":
             if turn is True and moving is False:
                 if board_game[play_y_f][play_x_f] == "(O)":
@@ -82,6 +82,7 @@ def move_check(y,x,turn,moving):
             validmove_f = True
             move_validity = [play_x_f, play_y_f, validmove_f, False]
             return move_validity
+
     else:
         print('Invalid Move')
         move_validity = [0, 0, False, False]
