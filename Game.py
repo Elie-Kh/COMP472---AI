@@ -41,7 +41,7 @@ def win_check():
     return
 
 
-def move_check(y,x):
+def move_check(y,x,turn,moving):
     try:
         play_y_f = int(y)
         try:
@@ -51,23 +51,44 @@ def move_check(y,x):
                 play_x_f = int(x_dict[x])
             else:
                 print("Invalid input")
-                move_validity = [0, 0, False]
+                move_validity = [0, 0, False, False]
                 return move_validity
     except ValueError:
         print("Invalid input")
-        move_validity = [0, 0, False]
+        move_validity = [0, 0, False, False]
         return move_validity
     if play_x_f <= 11 and play_y_f <= 9:
         if board_game[play_y_f][play_x_f] != "( )":
-            print('Invalid Move')
-            move_validity = [0, 0, False]
-            return move_validity
+            if turn is True and moving is False:
+                if board_game[play_y_f][play_x_f] == "(O)":
+                    print('Invalid Move')
+                    move_validity = [0, 0, False, False]
+                    return move_validity
+                else:
+                    print('Are you sure you want to move your token')
+                    validmove_f = True
+                    move_validity = [play_x_f, play_y_f, validmove_f, True]
+                    return move_validity
+            elif moving is False:
+                if board_game[play_y_f][play_x_f] == "(X)":
+                    print('Invalid Move')
+                    move_validity = [0, 0, False, False]
+                    return move_validity
+                else:
+                    validmove_f = True
+                    move_validity = [play_x_f, play_y_f, validmove_f, True]
+                    return  move_validity
         else:
-            move_validity = [play_x_f, play_y_f, True]
+            validmove_f = True
+            move_validity = [play_x_f, play_y_f, validmove_f, False]
+            return move_validity
+
     else:
         print('Invalid Move')
-        move_validity = [0, 0, False]
+        move_validity = [0, 0, False, False]
         return move_validity
+    print('Invalid Move')
+    move_validity = [0, 0, False, False]
     return move_validity
 
 
@@ -76,6 +97,9 @@ def move_check(y,x):
 play_x = 0
 play_y = 0
 p_play_x = 0
+p_play_y = 0
+play_x_old = 0
+play_y_old = 0
 x_dict = dict(A='0', B='1', C='2', D='3', E='4', F='5', G='6', H='7', I='8', J='9', K='10', L='11')
 p1_turn = True
 p1_tokens = 15
@@ -83,24 +107,51 @@ p2_tokens = 15
 moves = 0
 win = False
 validMove = False
+mover = False
 
 while moves != 30 or win is False:
     while validMove is False:
         p_play_x = input("enter X coordinate")
         p_play_y = input("enter Y coordinate")
-        checker = move_check(p_play_y, p_play_x)
+        checker = move_check(p_play_y, p_play_x,p1_turn,False)
         validMove = checker[2]
+        mover = checker[3]
         if validMove is True:
             play_x = checker[0]
             play_y = checker[1]
+    if mover is True:
+        confirm = input('Are you sure you want to move your token? Enter Y or N')
+        while confirm not in ("Y","N"):
+            confirm = input('Are you sure you want to move your token? Enter Y or N')
+        if confirm == "Y":
+            print("choose your new position")
+            play_x_old = play_x
+            play_y_old = play_y
+            validMove = False
+            mover = True
+            while validMove is False:
+                p_play_x = input("enter X coordinate")
+                p_play_y = input("enter Y coordinate")
+                checker = move_check(p_play_y, p_play_x, p1_turn,mover)
+                validMove = checker[2]
+                if validMove is True:
+                    play_x = checker[0]
+                    play_y = checker[1]
+
+        else:
+            validMove = False
+            mover = False
+            continue
     if p1_turn is True:
         board_game[play_y][play_x] = "(X)"
         p1_turn = False
     else:
         board_game[play_y][play_x] = "(O)"
         p1_turn = True
+    if mover is True:
+        board_game[play_y_old][play_x_old] = "( )"
     validMove = False
-
+    mover = False
     # check for win here
 
     gameboard()
