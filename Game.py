@@ -1,16 +1,15 @@
-
 board_game = [
-        ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-        ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-        ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-        ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-        ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-        ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-        ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-        ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-        ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-        ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ]
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+]
 column_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
 
 
@@ -31,17 +30,50 @@ def gameboard():
             if col != 0:
                 print(board_game[row][col], end='')
             else:
-                print(str(row)+ " " + board_game[row][col], end='')
+                print(str(row) + " " + board_game[row][col], end='')
         print()
     return board_game
 
 
+# check_adjacent looks at the adjacent cells to see if the winning pattern is present
+def check_adjacent(row, column, target):
+    # Checking against the middle of the X to win
+    if (row+1) <= len(board_game)-1 and (row-1) >= 0 and (column+1) <= len(column_letters)-1 and (column-1) >= 0:
+        if board_game[row-1][column-1] == target and board_game[row-1][column+1] == target and \
+                board_game[row+1][column-1] == target and board_game[row+1][column+1] == target:
+            return True
+    return False
+
+
+# check_cross checks to see if a player's win has been cancelled by the other player
+def check_cross(row, column):
+    if p1_turn:
+        target = "(X)"
+    else:
+        target = "(O)"
+
+    if board_game[row][column-1] == target and board_game[row][column+1] == target:
+        return True
+    return False
+
+
+# win_check loops through the game board to examine all cells with a token
 def win_check():
-    # function to be defined
-    return
+    # Turn is inverted because the turns will have already switched by the time the win is checked
+    if not p1_turn:
+        target = "(X)"
+    else:
+        target = "(O)"
+
+    for row in range(len(board_game)):
+        for column in range(len(column_letters)):
+            if board_game[row][column] == target and check_adjacent(row, column, target):
+                if not check_cross(row, column):
+                    return True
+    return False
 
 
-def move_check(y,x,turn,moving):
+def move_check(y, x, turn, moving):
     try:
         play_y_f = int(y)
         try:
@@ -77,7 +109,7 @@ def move_check(y,x,turn,moving):
                 else:
                     validmove_f = True
                     move_validity = [play_x_f, play_y_f, validmove_f, True]
-                    return  move_validity
+                    return move_validity
         else:
             validmove_f = True
             move_validity = [play_x_f, play_y_f, validmove_f, False]
@@ -110,18 +142,23 @@ validMove = False
 mover = False
 
 while moves != 30 or win is False:
+    if p1_turn:
+        player_turn = "Player 1 (X)"
+    else:
+        player_turn = "Player 2 (O)"
+
     while validMove is False:
-        p_play_x = input("enter X coordinate")
-        p_play_y = input("enter Y coordinate")
-        checker = move_check(p_play_y, p_play_x,p1_turn,False)
+        p_play_x = input("%s: Enter X coordinate" % player_turn)
+        p_play_y = input("%s: Enter Y coordinate" % player_turn)
+        checker = move_check(p_play_y, p_play_x, p1_turn, False)
         validMove = checker[2]
         mover = checker[3]
         if validMove is True:
             play_x = checker[0]
             play_y = checker[1]
     if mover is True:
-        confirm = input('Are you sure you want to move your token? Enter Y or N')
-        while confirm not in ("Y","N"):
+        confirm = input('Are you sure you want to move your token? Enter Y or N').upper()
+        while confirm not in ("Y", "N"):
             confirm = input('Are you sure you want to move your token? Enter Y or N')
         if confirm == "Y":
             print("choose your new position")
@@ -130,9 +167,9 @@ while moves != 30 or win is False:
             validMove = False
             mover = True
             while validMove is False:
-                p_play_x = input("enter X coordinate")
-                p_play_y = input("enter Y coordinate")
-                checker = move_check(p_play_y, p_play_x, p1_turn,mover)
+                p_play_x = input("%s: Enter X coordinate" % player_turn)
+                p_play_y = input("%s: Enter X coordinate" % player_turn)
+                checker = move_check(p_play_y, p_play_x, p1_turn, mover)
                 validMove = checker[2]
                 if validMove is True:
                     play_x = checker[0]
@@ -152,6 +189,16 @@ while moves != 30 or win is False:
         board_game[play_y_old][play_x_old] = "( )"
     validMove = False
     mover = False
-    # check for win here
 
+    print("\n")
     gameboard()
+    print("\n")
+
+    if win_check():
+        if not p1_turn:
+            print("\nThe game has been won by Player 1\n")
+        else:
+            print("\nThe game has been won by Player 2\n")
+        break
+
+print("Game Over")
