@@ -39,7 +39,7 @@ def gameboard():
         if i == 0:
             print('   ' + column_letters[i], end='')
         else:
-            print('   ' + column_letters[i], end='')
+            print('  ' + column_letters[i], end='')
     print()
 
     # labelling each row with numbers and printing the board
