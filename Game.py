@@ -12,6 +12,24 @@ board_game = [
 ]
 column_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
 
+# Variables below are used in the function
+# p_play variables are for getting user input
+play_x = 0
+play_y = 0
+p_play_x = 0
+p_play_y = 0
+play_x_old = 0
+play_y_old = 0
+x_dict = dict(A='0', B='1', C='2', D='3', E='4', F='5', G='6', H='7', I='8', J='9', K='10', L='11')
+p1_turn = True
+p1_tokens = 15
+p2_tokens = 15
+current_tokens = 0
+moves = 0
+win = False
+validMove = False
+mover = False
+
 
 # printing a 10 x 12 array to set up the game board
 def gameboard():
@@ -19,9 +37,9 @@ def gameboard():
     # Labelling columns with alphabet letters
     for i in range(len(column_letters)):
         if i == 0:
-            print('  ' + column_letters[i], end='')
+            print('   ' + column_letters[i], end='')
         else:
-            print('  ' + column_letters[i], end='')
+            print('   ' + column_letters[i], end='')
     print()
 
     # labelling each row with numbers and printing the board
@@ -73,7 +91,8 @@ def win_check():
     return False
 
 
-def move_check(y, x, turn, moving):
+def move_check(y, x, turn, moving, token_num):
+
     try:
         play_y_f = int(y)
         try:
@@ -83,83 +102,79 @@ def move_check(y, x, turn, moving):
                 play_x_f = int(x_dict[x])
             else:
                 print("Invalid input")
-                move_validity = [0, 0, False, False]
+                move_validity = [0, 0, False, False, token_num]
                 return move_validity
     except ValueError:
         print("Invalid input")
-        move_validity = [0, 0, False, False]
+        move_validity = [0, 0, False, False, token_num]
         return move_validity
     if play_x_f <= 11 and play_y_f <= 9:
         if board_game[play_y_f][play_x_f] != "( )":
             if turn is True and moving is False:
                 if board_game[play_y_f][play_x_f] == "(O)":
                     print('Invalid Move')
-                    move_validity = [0, 0, False, False]
+                    move_validity = [0, 0, False, False, token_num]
                     return move_validity
                 else:
-                    print('Are you sure you want to move your token')
+                    # print('Are you sure you want to move your token')
                     validmove_f = True
-                    move_validity = [play_x_f, play_y_f, validmove_f, True]
+                    move_validity = [play_x_f, play_y_f, validmove_f, True, token_num]
                     return move_validity
             elif moving is False:
                 if board_game[play_y_f][play_x_f] == "(X)":
                     print('Invalid Move')
-                    move_validity = [0, 0, False, False]
+                    move_validity = [0, 0, False, False, token_num]
                     return move_validity
                 else:
                     validmove_f = True
-                    move_validity = [play_x_f, play_y_f, validmove_f, True]
+                    move_validity = [play_x_f, play_y_f, validmove_f, True, token_num]
                     return move_validity
         else:
+            if token_num == 0 and moving is False:
+                print("You are out of tokens. Please move tokens already on the board")
+                move_validity = [0, 0, False, False, token_num]
+                return move_validity
+            else:
+                token_num -= 1
             validmove_f = True
-            move_validity = [play_x_f, play_y_f, validmove_f, False]
+            move_validity = [play_x_f, play_y_f, validmove_f, False, token_num]
             return move_validity
 
     else:
         print('Invalid Move')
-        move_validity = [0, 0, False, False]
+        move_validity = [0, 0, False, False, token_num]
         return move_validity
     print('Invalid Move')
-    move_validity = [0, 0, False, False]
+    move_validity = [0, 0, False, False, token_num]
     return move_validity
 
 
-# Variables below are used in the function
-# p_play variables are for getting user input
-play_x = 0
-play_y = 0
-p_play_x = 0
-p_play_y = 0
-play_x_old = 0
-play_y_old = 0
-x_dict = dict(A='0', B='1', C='2', D='3', E='4', F='5', G='6', H='7', I='8', J='9', K='10', L='11')
-p1_turn = True
-p1_tokens = 15
-p2_tokens = 15
-moves = 0
-win = False
-validMove = False
-mover = False
-
-while moves != 30 or win is False:
+while moves != 30 and win is False:
     if p1_turn:
         player_turn = "Player 1 (X)"
+        current_tokens = p1_tokens
     else:
         player_turn = "Player 2 (O)"
+        current_tokens = p2_tokens
 
     while validMove is False:
         p_play_x = input("%s: Enter X coordinate" % player_turn)
         p_play_y = input("%s: Enter Y coordinate" % player_turn)
-        checker = move_check(p_play_y, p_play_x, p1_turn, False)
+        checker = move_check(p_play_y, p_play_x, p1_turn, False, current_tokens)
         validMove = checker[2]
         mover = checker[3]
+        if p1_turn:
+            p1_tokens = checker[4]
+        else:
+            p2_tokens = checker[4]
         if validMove is True:
             play_x = checker[0]
             play_y = checker[1]
     if mover is True:
+        moves += 1
         confirm = input('Are you sure you want to move your token? Enter Y or N').upper()
         while confirm not in ("Y", "N"):
-            confirm = input('Are you sure you want to move your token? Enter Y or N')
+            confirm = input('Are you sure you want to move your token? Enter Y or N').upper()
         if confirm == "Y":
             print("choose your new position")
             play_x_old = play_x
@@ -169,7 +184,7 @@ while moves != 30 or win is False:
             while validMove is False:
                 p_play_x = input("%s: Enter X coordinate" % player_turn)
                 p_play_y = input("%s: Enter X coordinate" % player_turn)
-                checker = move_check(p_play_y, p_play_x, p1_turn, mover)
+                checker = move_check(p_play_y, p_play_x, p1_turn, mover, current_tokens)
                 validMove = checker[2]
                 if validMove is True:
                     play_x = checker[0]
@@ -199,6 +214,7 @@ while moves != 30 or win is False:
             print("\nThe game has been won by Player 1\n")
         else:
             print("\nThe game has been won by Player 2\n")
-        break
-
+        win = True
+    if moves == 30:
+        print("\nThe game has tied\n")
 print("Game Over")
