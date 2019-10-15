@@ -158,6 +158,7 @@ while moves != 30 and win is False:
         current_tokens = p2_tokens
 
     while validMove is False:
+        print("Moves remaining: %d" % (30 - moves))
         p_play_x = input("%s: Enter X coordinate" % player_turn)
         p_play_y = input("%s: Enter Y coordinate" % player_turn)
         checker = move_check(p_play_y, p_play_x, p1_turn, False, current_tokens)
