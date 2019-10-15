@@ -150,6 +150,7 @@ def move_check(y, x, turn, moving, token_num):
 
 
 while moves != 30 and win is False:
+    print("Moves remaining: %d" % (30 - moves))
     if p1_turn:
         player_turn = "Player 1 (X)"
         current_tokens = p1_tokens
@@ -158,7 +159,7 @@ while moves != 30 and win is False:
         current_tokens = p2_tokens
 
     while validMove is False:
-        print("Moves remaining: %d" % (30 - moves))
+
         p_play_x = input("%s: Enter X coordinate" % player_turn)
         p_play_y = input("%s: Enter Y coordinate" % player_turn)
         checker = move_check(p_play_y, p_play_x, p1_turn, False, current_tokens)
@@ -172,11 +173,12 @@ while moves != 30 and win is False:
             play_x = checker[0]
             play_y = checker[1]
     if mover is True:
-        moves += 1
         confirm = input('Are you sure you want to move your token? Enter Y or N').upper()
         while confirm not in ("Y", "N"):
             confirm = input('Are you sure you want to move your token? Enter Y or N').upper()
+
         if confirm == "Y":
+            moves += 1
             print("choose your new position")
             play_x_old = play_x
             play_y_old = play_y
