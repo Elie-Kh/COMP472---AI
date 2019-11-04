@@ -16,10 +16,10 @@ ex -    branches = get_branches(pos, turn)
 
 board = [
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "(X)", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "(O)", "(X)", "(O)", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "(X)", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
@@ -72,17 +72,12 @@ def get_starting_pos(board):
         get_starting_pos(board)
 
 
-# evaluate_moves returns a list of all possible moves
-def evaluate_moves(board, target):
-    potential_moves = evaluate_potential(board, target)
-
-
 # evaluate_potential looks all the AI tokens on the board and decides which token to base move decision on
 def evaluate_potential(board, target):
     moves = []
     for y in range(len(board)):
         for x in range(len(column_letters)):
-            if board[y][x] == target:
+            if board[y][x] == target[0]:
                 score = 1
                 if check_cross(y, x, target):
                     score = 0
@@ -97,8 +92,8 @@ def evaluate_potential(board, target):
                         score += 1
                 moves.append({'position': (x, y), 'score': score})
 
-    return sorted(moves, key=lambda i: i['score'])
-    # if returns an empty list - find new position
+    result = sorted(moves, key=lambda i: i['score'])
+    return result[-1]
 
 
 # get_ai_move evaluates the board and returns the AI's move
@@ -108,7 +103,16 @@ def get_ai_move(board, p1_turn):
     else:
         target = ("(O)", "(X)")
 
-    branches = evaluate_moves(board, target)
+    move = evaluate_potential(board, target)
+    x = move['position'][0]
+    y = move['position'][1]
+
+    
+
+    return move
 
 position = get_starting_pos(board)
 print(str(position[0]) + "-" + str(position[1]))
+
+moves = get_ai_move(board, True)
+print(moves)
