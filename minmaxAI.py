@@ -1,17 +1,11 @@
 import random
 
-# if the move gets the AI get closer to an X then +1
-# If the move gets the AI is adding to an impossible X the  -1
-
-# TODO - Get function that returns all possible moves for the AI
-# TODO - User recursion only list of moves to get a deeper N set of moves
 # TODO - Move the win check logic to its own file
-# TODO - Find a way to implement moves in to the decision
 
 board = [
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "(O)", "(X)", "(O)", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
@@ -117,12 +111,7 @@ def get_possible_token_locations(potential):
 
 
 # get_ai_token evaluates the board and returns the where the AI will place its token
-def get_ai_token(board, p1_turn):
-    if p1_turn:
-        target = ("(X)", "(O)")
-    else:
-        target = ("(O)", "(X)")
-
+def get_ai_token(board, target):
     potential_tokens = evaluate_potential(board, target)
     if potential_tokens[-1]['score'] != 0:
         chosen_locations = get_possible_token_locations(potential_tokens[-1])
@@ -132,12 +121,34 @@ def get_ai_token(board, p1_turn):
 
 
 # get_ai_move evaluates the board and returns which token to move where
-def get_ai_move(board, p1_turn):
+def get_ai_move(board, target):
+    potential_moves = evaluate_potential(board, target)
+    source = potential_moves[0]['position']
+
+    if potential_moves[-1]['score'] != 0:
+        chosen_locations = get_possible_token_locations(potential_moves[-1])
+        # Moves the min location to the max location
+        destination = chosen_locations[random.randrange(0, len(chosen_locations), 1)]
+        return source, destination
+
+    if potential_moves[-1]['score'] == 0:
+        destination = get_new_pos(board, target)
+        return source, destination
+
+
+# returns the AI move selection back to the Game.py main file
+def summon_ai_overlord(board, p1_turn, tokens):
     if p1_turn:
         target = ("(X)", "(O)")
     else:
         target = ("(O)", "(X)")
 
+    if tokens == 15:
+        return get_starting_pos(board)
+    if tokens <= 0:
+        return get_ai_move(board, target)
+    return get_ai_token(board, target)
 
-move = get_ai_token(board, False)
+
+move = summon_ai_overlord(board, True, 15)
 print(move)
