@@ -32,6 +32,7 @@ moves = 0
 win = False
 validMove = False
 mover = False
+ai_mode = True
 
 
 # printing a 10 x 12 array to set up the game board
@@ -120,48 +121,70 @@ while moves != 30 and win is False:
         player_turn = "Player 1 (X)"
         current_tokens = p1_tokens
     else:
-        player_turn = "Player 2 (O)"
+        if not ai_mode:
+            player_turn = "Player 2 (O)"
+        else:
+            player_turn = "AI (O)"
         current_tokens = p2_tokens
 
-    while validMove is False:
-
-        p_play_x = input("%s: Enter X coordinate" % player_turn)
-        p_play_y = input("%s: Enter Y coordinate" % player_turn)
-        checker = move_check(p_play_y, p_play_x, p1_turn, False, current_tokens)
-        validMove = checker[2]
-        mover = checker[3]
-        if p1_turn:
-            p1_tokens = checker[4]
-        else:
-            p2_tokens = checker[4]
-        if validMove is True:
-            play_x = checker[0]
-            play_y = checker[1]
-    if mover is True:
-        confirm = input('Are you sure you want to move your token? Enter Y or N').upper()
-        while confirm not in ("Y", "N"):
-            confirm = input('Are you sure you want to move your token? Enter Y or N').upper()
-
-        if confirm == "Y":
-            moves += 1
-            print("choose your new position")
-            play_x_old = play_x
-            play_y_old = play_y
-            validMove = False
-            mover = True
-            while validMove is False:
+    if p1_turn or not ai_mode:
+        while validMove is False:
+            if p1_turn:
                 p_play_x = input("%s: Enter X coordinate" % player_turn)
-                p_play_y = input("%s: Enter X coordinate" % player_turn)
-                checker = move_check(p_play_y, p_play_x, p1_turn, mover, current_tokens)
+                p_play_y = input("%s: Enter Y coordinate" % player_turn)
+                checker = move_check(p_play_y, p_play_x, p1_turn, False, current_tokens)
                 validMove = checker[2]
+                mover = checker[3]
+                if p1_turn:
+                    p1_tokens = checker[4]
+                else:
+                    p2_tokens = checker[4]
                 if validMove is True:
                     play_x = checker[0]
                     play_y = checker[1]
+        if mover is True:
+            confirm = input('Are you sure you want to move your token? Enter Y or N').upper()
+            while confirm not in ("Y", "N"):
+                confirm = input('Are you sure you want to move your token? Enter Y or N').upper()
 
+            if confirm == "Y":
+                moves += 1
+                print("choose your new position")
+                play_x_old = play_x
+                play_y_old = play_y
+                validMove = False
+                mover = True
+                while validMove is False:
+                    p_play_x = input("%s: Enter X coordinate" % player_turn)
+                    p_play_y = input("%s: Enter X coordinate" % player_turn)
+                    checker = move_check(p_play_y, p_play_x, p1_turn, mover, current_tokens)
+                    validMove = checker[2]
+                    if validMove is True:
+                        play_x = checker[0]
+                        play_y = checker[1]
+
+            else:
+                validMove = False
+                mover = False
+                continue
+
+    # AI turn logic
+    else:
+        move = summon_ai_overlord(board_game, p1_turn, current_tokens)
+        if current_tokens <= 0:
+            play_y_old = move[0][1]
+            play_x_old = move[0][0]
+            play_y = move[1][1]
+            play_x = move[1][0]
+            mover = True
+            moves += 1
+            print("\nAI Move: (%s, %s) to (%s, %s)" % (str(play_x_old), str(play_y_old), str(play_x), str(play_y)))
         else:
-            validMove = False
-            mover = False
-            continue
+            play_y = move[1]
+            play_x = move[0]
+            p2_tokens = current_tokens - 1
+            print("\nAI Token Placed: (%s, %s)" % (str(play_x), str(play_y)))
+
     if p1_turn is True:
         board_game[play_y][play_x] = "(X)"
         p1_turn = False
@@ -181,7 +204,10 @@ while moves != 30 and win is False:
         if not p1_turn:
             print("\nThe game has been won by Player 1\n")
         else:
-            print("\nThe game has been won by Player 2\n")
+            if ai_mode:
+                print("\nThe game has been won by the AI\n")
+            else:
+                print("\nThe game has been won by Player 2\n")
         win = True
     if moves == 30:
         print("\nThe game has tied\n")

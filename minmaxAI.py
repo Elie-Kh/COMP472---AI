@@ -1,20 +1,6 @@
 import random
 from win_check import check_cross
 
-# TODO - Move the win check logic to its own file
-
-board = [
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "(O)", "(X)", "(O)", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-]
 column_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
 # 0-9 across ; 0-7 down -> board[y][x]
 
@@ -22,8 +8,8 @@ column_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
 # get_starting_pos finds a random starting position for the AI to place its first token
 def get_starting_pos(board):
     random.seed(random.randrange(0, 100, 1))
-    x = random.randrange(0, 10, 1)
-    y = random.randrange(0, 8, 1)
+    x = random.randrange(1, 10, 1)
+    y = random.randrange(1, 8, 1)
     pos = (x, y)
 
     # if position is already occupied run function again until it finds a good spot
@@ -36,8 +22,8 @@ def get_starting_pos(board):
 # get_new_pos finds a new spot for the Ai to place a token (when all potential X's are blocked)
 def get_new_pos(board, target):
     random.seed(random.randrange(0, 100, 1))
-    x = random.randrange(0, 10, 1)
-    y = random.randrange(0, 8, 1)
+    x = random.randrange(1, 10, 1)
+    y = random.randrange(1, 8, 1)
     pos = (x, y)
 
     # make sure the position is valid
@@ -61,26 +47,27 @@ def evaluate_potential(board, target):
                 bl = False
                 br = False
                 # checks to make sure the X hasn't been cancelled by opponent
-                if check_cross(y, x, target, board):
-                    score = 0
-                # checks to make sure an X is still possible and not blocked by opponent
-                elif board[y - 1][x - 1] == target[1] or board[y - 1][x + 1] == target[1] or \
-                        board[y + 1][x - 1] == target[1] or board[y + 1][x + 1] == target[1]:
-                    score = 0
-                # score increments by 1 for each part of the X already filled in
-                else:
-                    if board[y - 1][x - 1] == target[0]:
-                        score += 1
-                        tl = True
-                    if board[y - 1][x + 1] == target[0]:
-                        score += 1
-                        tr = True
-                    if board[y + 1][x - 1] == target[0]:
-                        score += 1
-                        bl = True
-                    if board[y + 1][x + 1] == target[0]:
-                        score += 1
-                        br = True
+                if 11 > x > 0 and 9 > y > 0:
+                    if check_cross(y, x, target, board):
+                        score = 0
+                    # checks to make sure an X is still possible and not blocked by opponent
+                    elif board[y - 1][x - 1] == target[1] or board[y - 1][x + 1] == target[1] or \
+                            board[y + 1][x - 1] == target[1] or board[y + 1][x + 1] == target[1]:
+                        score = 1
+                    # score increments by 1 for each part of the X already filled in
+                    else:
+                        if board[y - 1][x - 1] == target[0]:
+                            score += 1
+                            tl = True
+                        if board[y - 1][x + 1] == target[0]:
+                            score += 1
+                            tr = True
+                        if board[y + 1][x - 1] == target[0]:
+                            score += 1
+                            bl = True
+                        if board[y + 1][x + 1] == target[0]:
+                            score += 1
+                            br = True
                 moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
 
     result = sorted(moves, key=lambda i: i['score'])
@@ -142,7 +129,3 @@ def summon_ai_overlord(board, p1_turn, tokens):
     if tokens <= 0:
         return get_ai_move(board, target)
     return get_ai_token(board, target)
-
-
-move = summon_ai_overlord(board, True, 0)
-print(move)
