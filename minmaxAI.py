@@ -1,4 +1,5 @@
 import random
+from win_check import check_cross
 
 # TODO - Move the win check logic to its own file
 
@@ -6,7 +7,7 @@ board = [
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "(O)", "(X)", "(O)", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
@@ -16,13 +17,6 @@ board = [
 ]
 column_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
 # 0-9 across ; 0-7 down -> board[y][x]
-
-
-# check_cross checks to see if a player's win has been cancelled by the other player
-def check_cross(row, column, target):
-    if board[row][column-1] == target[1] and board[row][column+1] == target[1]:
-        return True
-    return False
 
 
 # get_starting_pos finds a random starting position for the AI to place its first token
@@ -67,7 +61,7 @@ def evaluate_potential(board, target):
                 bl = False
                 br = False
                 # checks to make sure the X hasn't been cancelled by opponent
-                if check_cross(y, x, target):
+                if check_cross(y, x, target, board):
                     score = 0
                 # checks to make sure an X is still possible and not blocked by opponent
                 elif board[y - 1][x - 1] == target[1] or board[y - 1][x + 1] == target[1] or \
@@ -150,5 +144,5 @@ def summon_ai_overlord(board, p1_turn, tokens):
     return get_ai_token(board, target)
 
 
-move = summon_ai_overlord(board, True, 15)
+move = summon_ai_overlord(board, True, 0)
 print(move)

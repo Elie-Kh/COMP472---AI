@@ -1,3 +1,6 @@
+from minmaxAI import summon_ai_overlord
+from win_check import win_check
+
 board_game = [
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
@@ -51,44 +54,6 @@ def gameboard():
                 print(str(row) + " " + board_game[row][col], end='')
         print()
     return board_game
-
-
-# check_adjacent looks at the adjacent cells to see if the winning pattern is present
-def check_adjacent(row, column, target):
-    # Checking against the middle of the X to win
-    if (row+1) <= len(board_game)-1 and (row-1) >= 0 and (column+1) <= len(column_letters)-1 and (column-1) >= 0:
-        if board_game[row-1][column-1] == target and board_game[row-1][column+1] == target and \
-                board_game[row+1][column-1] == target and board_game[row+1][column+1] == target:
-            return True
-    return False
-
-
-# check_cross checks to see if a player's win has been cancelled by the other player
-def check_cross(row, column):
-    if p1_turn:
-        target = "(X)"
-    else:
-        target = "(O)"
-
-    if board_game[row][column-1] == target and board_game[row][column+1] == target:
-        return True
-    return False
-
-
-# win_check loops through the game board to examine all cells with a token
-def win_check():
-    # Turn is inverted because the turns will have already switched by the time the win is checked
-    if not p1_turn:
-        target = "(X)"
-    else:
-        target = "(O)"
-
-    for row in range(len(board_game)):
-        for column in range(len(column_letters)):
-            if board_game[row][column] == target and check_adjacent(row, column, target):
-                if not check_cross(row, column):
-                    return True
-    return False
 
 
 def move_check(y, x, turn, moving, token_num):
@@ -212,7 +177,7 @@ while moves != 30 and win is False:
     gameboard()
     print("\n")
 
-    if win_check():
+    if win_check(board_game, p1_turn):
         if not p1_turn:
             print("\nThe game has been won by Player 1\n")
         else:
@@ -221,3 +186,5 @@ while moves != 30 and win is False:
     if moves == 30:
         print("\nThe game has tied\n")
 print("Game Over")
+
+
