@@ -8,18 +8,12 @@ import random
 # TODO - Move the win check logic to its own file
 # TODO - Find a way to implement moves in to the decision
 
-
-'''
-ex -    branches = get_branches(pos, turn)
-        branch_evals = [solve(branch) for branch in branches]
-'''
-
 board = [
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "(X)", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "(O)", "(X)", "(O)", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "(X)", "( )", "( )", "( )", "( )"],
+    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
@@ -30,31 +24,10 @@ column_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
 # 0-9 across ; 0-7 down -> board[y][x]
 
 
-# check_adjacent looks at the adjacent cells to see if the winning pattern is present
-def check_adjacent(row, column, target):
-    # Checking against the middle of the X to win
-    if (row+1) <= len(board)-1 and (row-1) >= 0 and (column+1) <= len(column_letters)-1 and (column-1) >= 0:
-        if board[row-1][column-1] == target[0] and board[row-1][column+1] == target[0] and \
-                board[row+1][column-1] == target[0] and board[row+1][column+1] == target[0]:
-            return True
-    return False
-
-
 # check_cross checks to see if a player's win has been cancelled by the other player
 def check_cross(row, column, target):
     if board[row][column-1] == target[1] and board[row][column+1] == target[1]:
         return True
-    return False
-
-
-# win_check loops through the game board to examine all cells with a token
-def win_check(board, target):
-    # Turn is inverted because the turns will have already switched by the time the win is checked
-    for row in range(len(board)):
-        for column in range(len(column_letters)):
-            if board[row][column] == target[0] and check_adjacent(row, column, target):
-                if not check_cross(row, column, target):
-                    return True
     return False
 
 
@@ -72,6 +45,22 @@ def get_starting_pos(board):
         get_starting_pos(board)
 
 
+# get_new_pos finds a new spot for the Ai to place a token (when all potential X's are blocked)
+def get_new_pos(board, target):
+    random.seed(random.randrange(0, 100, 1))
+    x = random.randrange(0, 10, 1)
+    y = random.randrange(0, 8, 1)
+    pos = (x, y)
+
+    # make sure the position is valid
+    if board[y][x] != "( )":
+        get_new_pos(board, target)
+    elif board[y][x-1] and board[y][x+1] == target[1]:
+        get_new_pos(board, target)
+
+    return pos
+
+
 # evaluate_potential looks all the AI tokens on the board and decides which token to base move decision on
 def evaluate_potential(board, target):
     moves = []
@@ -79,40 +68,76 @@ def evaluate_potential(board, target):
         for x in range(len(column_letters)):
             if board[y][x] == target[0]:
                 score = 1
+                tl = False    # each refers to a relative position in the X (tl = top left, etc...)
+                tr = False
+                bl = False
+                br = False
+                # checks to make sure the X hasn't been cancelled by opponent
                 if check_cross(y, x, target):
                     score = 0
+                # checks to make sure an X is still possible and not blocked by opponent
+                elif board[y - 1][x - 1] == target[1] or board[y - 1][x + 1] == target[1] or \
+                        board[y + 1][x - 1] == target[1] or board[y + 1][x + 1] == target[1]:
+                    score = 0
+                # score increments by 1 for each part of the X already filled in
                 else:
                     if board[y - 1][x - 1] == target[0]:
                         score += 1
+                        tl = True
                     if board[y - 1][x + 1] == target[0]:
                         score += 1
+                        tr = True
                     if board[y + 1][x - 1] == target[0]:
                         score += 1
+                        bl = True
                     if board[y + 1][x + 1] == target[0]:
                         score += 1
-                moves.append({'position': (x, y), 'score': score})
+                        br = True
+                moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
 
     result = sorted(moves, key=lambda i: i['score'])
-    return result[-1]
+    return result
 
 
-# get_ai_move evaluates the board and returns the AI's move
+# get_possible_token_locations returns a list of possible location for the next token placement/move
+def get_possible_token_locations(potential):
+    potential_locations = []
+    for spot in ['tl', 'tr', 'bl', 'br']:
+        if not potential[spot]:
+            if spot == 'tl':
+                potential_locations.append((potential['position'][0] - 1, potential['position'][1] - 1))
+            if spot == 'tr':
+                potential_locations.append((potential['position'][0] + 1, potential['position'][1] - 1))
+            if spot == 'bl':
+                potential_locations.append((potential['position'][0] - 1, potential['position'][1] + 1))
+            if spot == 'br':
+                potential_locations.append((potential['position'][0] + 1, potential['position'][1] + 1))
+
+    return potential_locations
+
+
+# get_ai_token evaluates the board and returns the where the AI will place its token
+def get_ai_token(board, p1_turn):
+    if p1_turn:
+        target = ("(X)", "(O)")
+    else:
+        target = ("(O)", "(X)")
+
+    potential_tokens = evaluate_potential(board, target)
+    if potential_tokens[-1]['score'] != 0:
+        chosen_locations = get_possible_token_locations(potential_tokens[-1])
+        return chosen_locations[random.randrange(0, len(chosen_locations), 1)]
+    if potential_tokens[-1]['score'] == 0:
+        return get_new_pos(board, target)
+
+
+# get_ai_move evaluates the board and returns which token to move where
 def get_ai_move(board, p1_turn):
     if p1_turn:
         target = ("(X)", "(O)")
     else:
         target = ("(O)", "(X)")
 
-    move = evaluate_potential(board, target)
-    x = move['position'][0]
-    y = move['position'][1]
 
-    
-
-    return move
-
-position = get_starting_pos(board)
-print(str(position[0]) + "-" + str(position[1]))
-
-moves = get_ai_move(board, True)
-print(moves)
+move = get_ai_token(board, False)
+print(move)
