@@ -80,7 +80,7 @@ def evaluate_potential(board, target):
                             moves.clear()
                             moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
                             return moves
-                moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
+                    moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
             elif board[y][x] == target[1]:
                 score = 1
                 tl = False  # each refers to a relative position in the X (tl = top left, etc...)
@@ -109,7 +109,7 @@ def evaluate_potential(board, target):
                         if board[y + 1][x + 1] == target[1]:
                             score += 1
                             br = True
-                moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
+                    moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
             else:
                 # if emptyBoard is False:
                 score = 0
@@ -128,34 +128,34 @@ def evaluate_potential(board, target):
                             tl = True
                         elif board[y - 1][x - 1] == target[1]:
                             score -= 1
-                            tl = True
+                            tl = False
                         if board[y - 1][x + 1] == target[0]:
                             score += 1
                             tr = True
                         elif board[y - 1][x + 1] == target[1]:
                             score -= 1
-                            tl = True
+                            tl = False
                         if board[y + 1][x - 1] == target[0]:
                             score += 1
                             bl = True
                         elif board[y + 1][x - 1] == target[1]:
                             score -= 1
-                            tl = True
+                            tl = False
                         if board[y + 1][x + 1] == target[0]:
                             score += 1
                             br = True
                         elif board[y + 1][x + 1] == target[1]:
                             score -= 1
-                            tl = True
-                moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
-                if score == 4:
-                    moves.clear()
+                            tl = False
                     moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
-                    return moves
-                if score == -4:
-                    moves.clear()
-                    moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
-                    return moves
+                    if score == 4:
+                        moves.clear()
+                        moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
+                        return moves
+                    if score == -4:
+                        moves.clear()
+                        moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
+                        return moves
 
     result = sorted(moves, key=lambda i: i['score'])
     return result
