@@ -68,7 +68,81 @@ def evaluate_potential(board, target):
                         if board[y + 1][x + 1] == target[0]:
                             score += 1
                             br = True
+                        if score == 5:
+                            moves.clear()
+                            moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
+                            return moves
                 moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
+            elif board[y][x] == target[1]:
+                score = 1
+                tl = False  # each refers to a relative position in the X (tl = top left, etc...)
+                tr = False
+                bl = False
+                br = False
+                # checks to make sure the X hasn't been cancelled by opponent
+                if 11 > x > 0 and 9 > y > 0:
+                    if check_cross(y, x, target, board):
+                        score = 0
+                    # checks to make sure an X is still possible and not blocked by opponent
+                    elif board[y - 1][x - 1] == target[0] or board[y - 1][x + 1] == target[0] or \
+                            board[y + 1][x - 1] == target[0] or board[y + 1][x + 1] == target[0]:
+                        score = 1
+                    # score increments by 1 for each part of the X already filled in
+                    else:
+                        if board[y - 1][x - 1] == target[1]:
+                            score += 1
+                            tl = True
+                        if board[y - 1][x + 1] == target[1]:
+                            score += 1
+                            tr = True
+                        if board[y + 1][x - 1] == target[1]:
+                            score += 1
+                            bl = True
+                        if board[y + 1][x + 1] == target[1]:
+                            score += 1
+                            br = True
+                moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
+            else:
+                score = 0
+                tl = False  # each refers to a relative position in the X (tl = top left, etc...)
+                tr = False
+                bl = False
+                br = False
+                # checks to make sure the X hasn't been cancelled by opponent
+                if 11 > x > 0 and 9 > y > 0:
+                    if check_cross(y, x, target, board):
+                        score = 0
+                    # score increments by 1 for each part of the X already filled in
+                    else:
+                        if board[y - 1][x - 1] == target[0]:
+                            score += 1
+                            tl = True
+                        elif board[y - 1][x - 1] == target[1]:
+                            score -= 1
+                            tl = True
+                        if board[y - 1][x + 1] == target[0]:
+                            score += 1
+                            tr = True
+                        elif board[y - 1][x + 1] == target[1]:
+                            score -= 1
+                            tl = True
+                        if board[y + 1][x - 1] == target[0]:
+                            score += 1
+                            bl = True
+                        elif board[y + 1][x - 1] == target[1]:
+                            score -= 1
+                            tl = True
+                        if board[y + 1][x + 1] == target[0]:
+                            score += 1
+                            br = True
+                        elif board[y + 1][x + 1] == target[1]:
+                            score -= 1
+                            tl = True
+                moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
+                if score == -4:
+                    moves.clear()
+                    moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
+                    return moves
 
     result = sorted(moves, key=lambda i: i['score'])
     return result
@@ -94,6 +168,9 @@ def get_possible_token_locations(potential):
 # get_ai_token evaluates the board and returns the where the AI will place its token
 def get_ai_token(board, target):
     potential_tokens = evaluate_potential(board, target)
+    if len(potential_tokens) == 1:
+        chosen_locations = potential_tokens[0]['position']
+        return chosen_locations
     if potential_tokens[-1]['score'] != 0:
         chosen_locations = get_possible_token_locations(potential_tokens[-1])
         return chosen_locations[random.randrange(0, len(chosen_locations), 1)]

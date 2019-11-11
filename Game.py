@@ -183,7 +183,7 @@ while moves != 30 and win is False:
             play_y = move[1]
             play_x = move[0]
             p2_tokens = current_tokens - 1
-            print("\nAI Token Placed: (%s, %s)" % (str(play_x), str(play_y)))
+            print("\nAI Token Placed: (%s, %s)" % (x_dict[str(play_x)], str(play_y)))
 
     if p1_turn is True:
         board_game[play_y][play_x] = "(X)"
