@@ -1,19 +1,7 @@
 from minmaxAI import summon_ai_overlord
 from win_check import win_check
+from Board import board_game,x_dict,column_letters,move_check
 
-board_game = [
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-    ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
-]
-column_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
 
 # Variables below are used in the function
 # p_play variables are for getting user input
@@ -23,7 +11,6 @@ p_play_x = 0
 p_play_y = 0
 play_x_old = 0
 play_y_old = 0
-x_dict = dict(A='0', B='1', C='2', D='3', E='4', F='5', G='6', H='7', I='8', J='9', K='10', L='11')
 p1_turn = True
 p1_tokens = 15
 p2_tokens = 15
@@ -57,62 +44,7 @@ def gameboard():
     return board_game
 
 
-def move_check(y, x, turn, moving, token_num):
 
-    try:
-        play_y_f = int(y)
-        try:
-            play_x_f = int(x)
-        except ValueError:
-            if x in x_dict:
-                play_x_f = int(x_dict[x])
-            else:
-                print("Invalid input")
-                move_validity = [0, 0, False, False, token_num]
-                return move_validity
-    except ValueError:
-        print("Invalid input")
-        move_validity = [0, 0, False, False, token_num]
-        return move_validity
-    if play_x_f <= 11 and play_y_f <= 9:
-        if board_game[play_y_f][play_x_f] != "( )":
-            if turn is True and moving is False:
-                if board_game[play_y_f][play_x_f] == "(O)":
-                    print('Invalid Move')
-                    move_validity = [0, 0, False, False, token_num]
-                    return move_validity
-                else:
-                    # print('Are you sure you want to move your token')
-                    validmove_f = True
-                    move_validity = [play_x_f, play_y_f, validmove_f, True, token_num]
-                    return move_validity
-            elif moving is False:
-                if board_game[play_y_f][play_x_f] == "(X)":
-                    print('Invalid Move')
-                    move_validity = [0, 0, False, False, token_num]
-                    return move_validity
-                else:
-                    validmove_f = True
-                    move_validity = [play_x_f, play_y_f, validmove_f, True, token_num]
-                    return move_validity
-        else:
-            if token_num == 0 and moving is False:
-                print("You are out of tokens. Please move tokens already on the board")
-                move_validity = [0, 0, False, False, token_num]
-                return move_validity
-            else:
-                token_num -= 1
-            validmove_f = True
-            move_validity = [play_x_f, play_y_f, validmove_f, False, token_num]
-            return move_validity
-
-    else:
-        print('Invalid Move')
-        move_validity = [0, 0, False, False, token_num]
-        return move_validity
-    print('Invalid Move')
-    move_validity = [0, 0, False, False, token_num]
-    return move_validity
 
 
 while moves != 30 and win is False:
@@ -178,12 +110,12 @@ while moves != 30 and win is False:
             play_x = move[1][0]
             mover = True
             moves += 1
-            print("\nAI Move: (%s, %s) to (%s, %s)" % (str(play_x_old), str(play_y_old), str(play_x), str(play_y)))
+            print("\nAI Move: (%s, %s) to (%s, %s)" % (list(x_dict.keys())[list(x_dict.values()).index(str(play_x_old))], str(play_y_old), list(x_dict.keys())[list(x_dict.values()).index(str(play_x))], str(play_y)))
         else:
             play_y = move[1]
             play_x = move[0]
             p2_tokens = current_tokens - 1
-            print("\nAI Token Placed: (%s, %s)" % (x_dict[str(play_x)], str(play_y)))
+            print("\nAI Token Placed: (%s, %s)" % (list(x_dict.keys())[list(x_dict.values()).index(str(play_x))], str(play_y)))
 
     if p1_turn is True:
         board_game[play_y][play_x] = "(X)"
