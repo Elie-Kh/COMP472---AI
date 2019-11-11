@@ -5,6 +5,8 @@ column_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
 # 0-9 across ; 0-7 down -> board[y][x]
 global emptyBoard
 emptyBoard = True
+global noGood
+noGood = False
 
 
 # get_starting_pos finds a random starting position for the AI to place its first token
@@ -109,51 +111,51 @@ def evaluate_potential(board, target):
                             br = True
                 moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
             else:
-                if emptyBoard is False:
-                    score = 0
-                    tl = False  # each refers to a relative position in the X (tl = top left, etc...)
-                    tr = False
-                    bl = False
-                    br = False
-                    # checks to make sure the X hasn't been cancelled by opponent
-                    if 11 > x > 0 and 9 > y > 0:
-                        if check_cross(y, x, target, board):
-                            score = 0
-                        # score increments by 1 for each part of the X already filled in
-                        else:
-                            if board[y - 1][x - 1] == target[0]:
-                                score += 1
-                                tl = True
-                            elif board[y - 1][x - 1] == target[1]:
-                                score -= 1
-                                tl = True
-                            if board[y - 1][x + 1] == target[0]:
-                                score += 1
-                                tr = True
-                            elif board[y - 1][x + 1] == target[1]:
-                                score -= 1
-                                tl = True
-                            if board[y + 1][x - 1] == target[0]:
-                                score += 1
-                                bl = True
-                            elif board[y + 1][x - 1] == target[1]:
-                                score -= 1
-                                tl = True
-                            if board[y + 1][x + 1] == target[0]:
-                                score += 1
-                                br = True
-                            elif board[y + 1][x + 1] == target[1]:
-                                score -= 1
-                                tl = True
+                # if emptyBoard is False:
+                score = 0
+                tl = False  # each refers to a relative position in the X (tl = top left, etc...)
+                tr = False
+                bl = False
+                br = False
+                # checks to make sure the X hasn't been cancelled by opponent
+                if 11 > x > 0 and 9 > y > 0:
+                    if check_cross(y, x, target, board):
+                        score = 0
+                    # score increments by 1 for each part of the X already filled in
+                    else:
+                        if board[y - 1][x - 1] == target[0]:
+                            score += 1
+                            tl = True
+                        elif board[y - 1][x - 1] == target[1]:
+                            score -= 1
+                            tl = True
+                        if board[y - 1][x + 1] == target[0]:
+                            score += 1
+                            tr = True
+                        elif board[y - 1][x + 1] == target[1]:
+                            score -= 1
+                            tl = True
+                        if board[y + 1][x - 1] == target[0]:
+                            score += 1
+                            bl = True
+                        elif board[y + 1][x - 1] == target[1]:
+                            score -= 1
+                            tl = True
+                        if board[y + 1][x + 1] == target[0]:
+                            score += 1
+                            br = True
+                        elif board[y + 1][x + 1] == target[1]:
+                            score -= 1
+                            tl = True
+                moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
+                if score == 4:
+                    moves.clear()
                     moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
-                    if score == 4:
-                        moves.clear()
-                        moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
-                        return moves
-                    if score == -4:
-                        moves.clear()
-                        moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
-                        return moves
+                    return moves
+                if score == -4:
+                    moves.clear()
+                    moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
+                    return moves
 
     result = sorted(moves, key=lambda i: i['score'])
     return result
@@ -165,22 +167,16 @@ def get_possible_token_locations(potential):
     for spot in ['tl', 'tr', 'bl', 'br']:
         if not potential[spot]:
             if spot == 'tl':
-                valid = move_check(potential['position'][0] - 1, potential['position'][1] - 1, False, False, 15)
-                if valid[2] is True:
-                    potential_locations.append((potential['position'][0] - 1, potential['position'][1] - 1))
+                potential_locations.append((potential['position'][0] - 1, potential['position'][1] - 1))
             if spot == 'tr':
-                valid = move_check(potential['position'][0] + 1, potential['position'][1] - 1, False, False, 15)
-                if valid[2] is True:
-                    potential_locations.append((potential['position'][0] + 1, potential['position'][1] - 1))
+                potential_locations.append((potential['position'][0] + 1, potential['position'][1] - 1))
             if spot == 'bl':
-                valid = move_check(potential['position'][0] - 1, potential['position'][1] + 1, False, False, 15)
-                if valid[2] is True:
-                    potential_locations.append((potential['position'][0] - 1, potential['position'][1] + 1))
+                potential_locations.append((potential['position'][0] - 1, potential['position'][1] + 1))
             if spot == 'br':
-                valid = move_check(potential['position'][0] + 1, potential['position'][1] + 1, False, False, 15)
-                if valid[2] is True:
-                    potential_locations.append((potential['position'][0] + 1, potential['position'][1] + 1))
-
+                potential_locations.append((potential['position'][0] + 1, potential['position'][1] + 1))
+    if len(potential_locations) == 0:
+        global noGood
+        noGood = True
     return potential_locations
 
 
@@ -188,11 +184,16 @@ def get_possible_token_locations(potential):
 def get_ai_token(board, target):
     potential_tokens = evaluate_potential(board, target)
     if len(potential_tokens) == 1:
-        chosen_locations = potential_tokens[0]['position']
+        chosen_locations = potential_tokens[-1]['position']
         return chosen_locations
     if potential_tokens[-1]['score'] != 0:
         chosen_locations = get_possible_token_locations(potential_tokens[-1])
-        return chosen_locations[random.randrange(0, len(chosen_locations), 1)]
+        global noGood
+        if noGood is True:
+            noGood = False
+            return get_new_pos(board, target)
+        if len(chosen_locations) != 0:
+            return chosen_locations[random.randrange(0, len(chosen_locations), 1)]
     if potential_tokens[-1]['score'] == 0:
         return get_new_pos(board, target)
 
@@ -205,8 +206,10 @@ def get_ai_move(board, target):
     if potential_moves[-1]['score'] != 0:
         chosen_locations = get_possible_token_locations(potential_moves[-1])
         # Moves the min location to the max location
-        destination = chosen_locations[random.randrange(0, len(chosen_locations), 1)]
-        return source, destination
+        if len(chosen_locations) != 0:
+            destination = chosen_locations[random.randrange(0, len(chosen_locations), 1)]
+
+            return source, destination
 
     if potential_moves[-1]['score'] == 0:
         destination = get_new_pos(board, target)
