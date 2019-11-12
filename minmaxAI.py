@@ -62,6 +62,7 @@ def evaluate_potential(board, target):
                     elif board[y - 1][x - 1] == target[1] or board[y - 1][x + 1] == target[1] or \
                             board[y + 1][x - 1] == target[1] or board[y + 1][x + 1] == target[1]:
                         score = 1
+                        continue
                     # score increments by 1 for each part of the X already filled in
                     else:
                         if board[y - 1][x - 1] == target[0]:
@@ -95,6 +96,7 @@ def evaluate_potential(board, target):
                     elif board[y - 1][x - 1] == target[0] or board[y - 1][x + 1] == target[0] or \
                             board[y + 1][x - 1] == target[0] or board[y + 1][x + 1] == target[0]:
                         score = 1
+                        continue
                     # score increments by 1 for each part of the X already filled in
                     else:
                         if board[y - 1][x - 1] == target[1]:
