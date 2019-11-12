@@ -147,7 +147,6 @@ def evaluate_potential(board, target):
                         elif board[y + 1][x + 1] == target[1]:
                             score -= 1
                             tl = False
-                    moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
                     if score == 4:
                         moves.clear()
                         moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
@@ -156,6 +155,7 @@ def evaluate_potential(board, target):
                         moves.clear()
                         moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
                         return moves
+                    moves.append({'position': (x, y), 'score': score, 'tl': tl, 'tr': tr, 'bl': bl, 'br': br})
 
     result = sorted(moves, key=lambda i: i['score'])
     return result

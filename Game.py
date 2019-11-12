@@ -102,18 +102,22 @@ while moves != 30 and win is False:
         while validMove is False:
             move = summon_ai_overlord(board_game, p1_turn, current_tokens)
             if current_tokens <= 0:
-                validMove = True
+                # validMove = True
                 play_y_old = move[0][1]
                 play_x_old = move[0][0]
                 play_y = move[1][1]
                 play_x = move[1][0]
+                checker = move_check(play_y, play_x, False, True, current_tokens)
+                validMove = checker[2]
+                if validMove is False:
+                    continue
                 mover = True
                 moves += 1
                 print("\nAI Move: (%s, %s) to (%s, %s)" % (list(x_dict.keys())[list(x_dict.values()).index(str(play_x_old))], str(play_y_old), list(x_dict.keys())[list(x_dict.values()).index(str(play_x))], str(play_y)))
             else:
                 play_y = move[1]
                 play_x = move[0]
-                checker = move_check(play_y, play_x, p1_turn, False, current_tokens)
+                checker = move_check(play_y, play_x, False, False, current_tokens)
                 validMove = checker[2]
                 if validMove is False:
                     continue
