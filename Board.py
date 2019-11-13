@@ -1,8 +1,3 @@
-from tkinter import *
-import tkinter.messagebox
-tk = Tk()
-tk.title("Nora game")
-
 board_game = [
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
     ["( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )", "( )"],
@@ -17,18 +12,6 @@ board_game = [
 ]
 column_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
 x_dict = dict(A='0', B='1', C='2', D='3', E='4', F='5', G='6', H='7', I='8', J='9', K='10', L='11')
-
-
-def disable_button():
-    button.configure(state=DISABLED)
-
-
-for r in range(10):
-    for c in range(12):
-        button = Button(tk, text=' ', font='Times 20 bold', bg='gray', fg='white', height=2, width=6)
-        button.grid(row=r, column=c)
-
-tk.mainloop()
 
 
 def move_check(y, x, turn, moving, token_num):
