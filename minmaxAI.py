@@ -183,8 +183,10 @@ def get_possible_token_locations(potential):
 
 
 # get_ai_token evaluates the board and returns the where the AI will place its token
-def get_ai_token(board, target):
+def get_ai_token(board, target, counter):
     potential_tokens = evaluate_potential(board, target)
+    if counter == 5:
+        return get_new_pos(board, target)
     if len(potential_tokens) == 1:
         chosen_locations = potential_tokens[-1]['position']
         return chosen_locations
@@ -201,9 +203,13 @@ def get_ai_token(board, target):
 
 
 # get_ai_move evaluates the board and returns which token to move where
-def get_ai_move(board, target):
+def get_ai_move(board, target, counter):
     potential_moves = evaluate_potential(board, target)
     source = potential_moves[0]['position']
+
+    if counter == 5:
+        destination = get_new_pos(board, target)
+        return source, destination
 
     if potential_moves[-1]['score'] != 0:
         chosen_locations = get_possible_token_locations(potential_moves[-1])
@@ -219,7 +225,7 @@ def get_ai_move(board, target):
 
 
 # returns the AI move selection back to the Game.py main file
-def summon_ai_overlord(board, p1_turn, tokens):
+def summon_ai_overlord(board, p1_turn, tokens, counter):
     if p1_turn:
         target = ("(X)", "(O)")
     else:
@@ -228,5 +234,5 @@ def summon_ai_overlord(board, p1_turn, tokens):
     if tokens == 15:
         return get_starting_pos(board)
     if tokens <= 0:
-        return get_ai_move(board, target)
-    return get_ai_token(board, target)
+        return get_ai_move(board, target, counter)
+    return get_ai_token(board, target, counter)
