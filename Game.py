@@ -44,6 +44,16 @@ def gameboard():
     return board_game
 
 
+print("Select starting player")
+startingPlayer = input('Do you want to go first? Enter Y or N').upper()
+while startingPlayer not in ("Y", "N"):
+    startingPlayer = input('Do you want to go first? Enter Y or N').upper()
+
+if startingPlayer == "Y":
+    p1_turn = True
+else:
+    p1_turn = False
+
 while moves != 30 and win is False:
     print("Moves remaining: %d" % (30 - moves))
     if p1_turn:
@@ -59,7 +69,7 @@ while moves != 30 and win is False:
     if p1_turn or not ai_mode:
         while validMove is False:
             if p1_turn:
-                p_play_x = input("%s: Enter X coordinate" % player_turn)
+                p_play_x = input("%s: Enter X coordinate" % player_turn).upper()
                 p_play_y = input("%s: Enter Y coordinate" % player_turn)
                 checker = move_check(p_play_y, p_play_x, p1_turn, False, current_tokens)
                 validMove = checker[2]
@@ -84,7 +94,7 @@ while moves != 30 and win is False:
                 validMove = False
                 mover = True
                 while validMove is False:
-                    p_play_x = input("%s: Enter X coordinate" % player_turn)
+                    p_play_x = input("%s: Enter X coordinate" % player_turn).upper()
                     p_play_y = input("%s: Enter X coordinate" % player_turn)
                     checker = move_check(p_play_y, p_play_x, p1_turn, mover, current_tokens)
                     validMove = checker[2]
