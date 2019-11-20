@@ -44,7 +44,9 @@ def gameboard():
     return board_game
 
 
-print("Select starting player")
+gameboard()
+print("\n")
+print('Welcome to X-Rudder!')
 startingPlayer = input('Do you want to go first? Enter Y or N').upper()
 while startingPlayer not in ("Y", "N"):
     startingPlayer = input('Do you want to go first? Enter Y or N').upper()
@@ -88,14 +90,14 @@ while moves != 30 and win is False:
 
             if confirm == "Y":
                 moves += 1
-                print("choose your new position")
+                print("Choose your new position")
                 play_x_old = play_x
                 play_y_old = play_y
                 validMove = False
                 mover = True
                 while validMove is False:
                     p_play_x = input("%s: Enter X coordinate" % player_turn).upper()
-                    p_play_y = input("%s: Enter X coordinate" % player_turn)
+                    p_play_y = input("%s: Enter Y coordinate" % player_turn)
                     checker = move_check(p_play_y, p_play_x, p1_turn, mover, current_tokens)
                     validMove = checker[2]
                     if validMove is True:
