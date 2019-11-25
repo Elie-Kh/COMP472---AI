@@ -1,5 +1,5 @@
 import random
-from win_check import check_cross
+from win_check import check_cross, win_check
 from Board import move_check
 column_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
 # 0-9 across ; 0-7 down -> board[y][x]
@@ -225,14 +225,45 @@ def get_ai_move(board, target, counter):
 
 
 # returns the AI move selection back to the Game.py main file
-def summon_ai_overlord(board, p1_turn, tokens, counter):
+def summon_ai_overlord(board, p1_turn, player_tokens, ai_tokens, lastAction, counter, bad_moves):
     if p1_turn:
         target = ("(X)", "(O)")
     else:
         target = ("(O)", "(X)")
 
-    if tokens == 15:
+    if ai_tokens == 15:
         return get_starting_pos(board)
-    if tokens <= 0:
-        return get_ai_move(board, target, counter)
-    return get_ai_token(board, target, counter)
+
+#if tokens <= 0:
+        #return get_ai_move(board, target, counter)
+    #return get_ai_token(board, target, counter)
+    return minimax(board, lastAction, player_tokens, ai_tokens, p1_turn, counter, bad_moves, target)
+
+def minimax(board, lastAction, player_tokens, ai_tokens, player1turn, nply, bad_moves, target):
+    if player1turn:
+        target = ("(X)", "(O)")
+    else:
+        target = ("(O)", "(X)")
+    if nply == 0 or win_check(board, player1turn) == True:
+        return lastAction
+
+    if player1turn:
+
+        if player_tokens <= 0:
+            action = get_ai_move(board, target, bad_moves)
+            tokens = player_tokens
+
+        else:
+            action = get_ai_token(board, target, bad_moves)
+            tokens = player_tokens - 1
+        minimax(action, tokens, ai_tokens, not player1turn, (nply - 1), bad_moves, target)
+
+    else:
+        if player_tokens <= 0:
+            action = get_ai_move(board, target, bad_moves)
+            tokens = ai_tokens
+
+        else:
+            action = get_ai_token(board, target, bad_moves)
+            tokens = ai_tokens - 1
+        minimax(action, player_tokens, tokens, not player1turn, (nply - 1), bad_moves, target)

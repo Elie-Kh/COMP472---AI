@@ -71,6 +71,7 @@ while moves != 30 and win is False:
                 if validMove is True:
                     play_x = checker[0]
                     play_y = checker[1]
+                    last_act = [play_x, play_y]
         if mover is True:
             confirm = input('Are you sure you want to move your token? Enter Y or N').upper()
             while confirm not in ("Y", "N"):
@@ -102,7 +103,7 @@ while moves != 30 and win is False:
         counter_bad = 0
         while validMove is False:
             counter_bad += 1
-            move = summon_ai_overlord(board_game, p1_turn, current_tokens,counter_bad)
+            move = summon_ai_overlord(board_game, p1_turn, p1_tokens,p2_tokens, last_act, 3, counter_bad)
             if current_tokens <= 0:
                 # validMove = True
                 play_y_old = move[0][1]
