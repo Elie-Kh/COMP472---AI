@@ -1,6 +1,8 @@
 import random
 from win_check import check_cross, win_check
-from Board import move_check
+from math import inf
+
+
 column_letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
 # 0-9 across ; 0-7 down -> board[y][x]
 global emptyBoard
@@ -234,36 +236,69 @@ def summon_ai_overlord(board, p1_turn, player_tokens, ai_tokens, lastAction, cou
     if ai_tokens == 15:
         return get_starting_pos(board)
 
-#if tokens <= 0:
-        #return get_ai_move(board, target, counter)
-    #return get_ai_token(board, target, counter)
-    return minimax(board, lastAction, player_tokens, ai_tokens, p1_turn, counter, bad_moves, target)
+# if tokens <= 0:
+        # return get_ai_move(board, target, counter)
+    # return get_ai_token(board, target, counter)
+    val = minimax(board, lastAction, player_tokens, ai_tokens, p1_turn, counter, bad_moves)
+    return val[0]['position']
 
-def minimax(board, lastAction, player_tokens, ai_tokens, player1turn, nply, bad_moves, target):
+
+def minimax(board, lastAction, player_tokens, ai_tokens, player1turn, nply, bad_moves):
     if player1turn:
         target = ("(X)", "(O)")
     else:
         target = ("(O)", "(X)")
     if nply == 0 or win_check(board, player1turn) == True:
         return lastAction
-
+    action = evaluate_potential(board, target)
     if player1turn:
 
+        min_val = 5000
         if player_tokens <= 0:
-            action = get_ai_move(board, target, bad_moves)
+            # if moving, get the worst move first and store it in source. then minimax on the rest
+            moves = get_ai_move(board, target, bad_moves)
+
             tokens = player_tokens
 
         else:
-            action = get_ai_token(board, target, bad_moves)
+            newPos = []
+            newPos.append({'position': (0, 0), 'score': 0})
+            newPos.append({'position': (0, 0), 'score': 0})
+            # action = get_ai_token(board, target, bad_moves)
             tokens = player_tokens - 1
-        minimax(action, tokens, ai_tokens, not player1turn, (nply - 1), bad_moves, target)
+            for pos in action:
+                tempBoard = board
+                tempBoard[pos['position'][0]-1][pos['position'][1]] = "(X)"
+                theval = minimax(tempBoard, pos['position'], tokens, ai_tokens, not player1turn, (nply - 1), bad_moves)
+                tempBoard[pos['position'][0]-1][pos['position'][1]] = "( )"
+                # min_val = max(min_val, pos[-1]['score'])
+                if (theval[-1]['score']) > min_val:
+                    newPos.clear()
+                    newPos = {'position': (pos['position'][0], pos['position'][1]), 'score': 0}
+                    min_val = theval[0]['score']
+        return newPos
 
     else:
+        max_val = -5000
         if player_tokens <= 0:
-            action = get_ai_move(board, target, bad_moves)
+            # if moving, get the best move first and store it in source. then minimax on the rest
+            # action = get_ai_move(board, target, bad_moves)
             tokens = ai_tokens
 
         else:
-            action = get_ai_token(board, target, bad_moves)
+            newPos = []
+            newPos.append({'position': (0, 0), 'score': 0})
+            newPos.append({'position': (0, 0), 'score': 0})
+            # action = get_ai_token(board, target, bad_moves)
             tokens = ai_tokens - 1
-        minimax(action, player_tokens, tokens, not player1turn, (nply - 1), bad_moves, target)
+            for pos in action:
+                tempBoard = board
+                tempBoard[pos['position'][0]-1][pos['position'][1]] = "(O)"
+                theval = minimax(tempBoard, action, tokens, ai_tokens, not player1turn, (nply - 1), bad_moves)
+                tempBoard[pos['position'][0]-1][pos['position'][1]] = "( )"
+                # min_val = max(min_val, pos[-1]['score'])
+                if (theval[0]['score']) < max_val:
+                    newPos.clear()
+                    newPos = {'position': (pos['position'][0], pos['position'][1]), 'score': 0}
+                    max_val = theval[0]['score']
+        return newPos
