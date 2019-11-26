@@ -1,3 +1,4 @@
+import copy
 import random
 from win_check import check_cross, win_check
 from math import inf
@@ -250,10 +251,13 @@ def minimax(board, lastAction, player_tokens, ai_tokens, player1turn, nply, bad_
         target = ("(O)", "(X)")
     if nply == 0 or win_check(board, player1turn) == True:
         return lastAction
-    action = evaluate_potential(board, target)
+    actions = evaluate_potential(board, target)
+    action = get_possible_token_locations(actions[-1])
+    tempBoard = copy.deepcopy(board)
+    newPos = []
     if player1turn:
 
-        min_val = 5000
+        min_val = 10
         if player_tokens <= 0:
             # if moving, get the worst move first and store it in source. then minimax on the rest
             moves = get_ai_move(board, target, bad_moves)
@@ -261,44 +265,41 @@ def minimax(board, lastAction, player_tokens, ai_tokens, player1turn, nply, bad_
             tokens = player_tokens
 
         else:
-            newPos = []
-            newPos.append({'position': (0, 0), 'score': 0})
-            newPos.append({'position': (0, 0), 'score': 0})
+            # newPos.append({'position': (0, 0), 'score': 0})
+            # newPos.append({'position': (0, 0), 'score': 0})
             # action = get_ai_token(board, target, bad_moves)
             tokens = player_tokens - 1
             for pos in action:
-                tempBoard = board
-                tempBoard[pos['position'][0]-1][pos['position'][1]] = "(X)"
+                tempBoard[[pos[1]][pos[0]]] = "(X)"
                 theval = minimax(tempBoard, pos['position'], tokens, ai_tokens, not player1turn, (nply - 1), bad_moves)
-                tempBoard[pos['position'][0]-1][pos['position'][1]] = "( )"
+                tempBoard[[pos[1]][pos[0]]] = "( )"
                 # min_val = max(min_val, pos[-1]['score'])
-                if (theval[-1]['score']) > min_val:
+                if theval[0]['score'] <= min_val:
                     newPos.clear()
-                    newPos = {'position': (pos['position'][0], pos['position'][1]), 'score': 0}
+                    newPos = [{'position': ([pos[1]][pos[0]]), 'score': 0}]
                     min_val = theval[0]['score']
         return newPos
 
     else:
-        max_val = -5000
+        max_val = -10
+
         if player_tokens <= 0:
             # if moving, get the best move first and store it in source. then minimax on the rest
             # action = get_ai_move(board, target, bad_moves)
             tokens = ai_tokens
 
         else:
-            newPos = []
-            newPos.append({'position': (0, 0), 'score': 0})
-            newPos.append({'position': (0, 0), 'score': 0})
+
             # action = get_ai_token(board, target, bad_moves)
             tokens = ai_tokens - 1
             for pos in action:
-                tempBoard = board
-                tempBoard[pos['position'][0]-1][pos['position'][1]] = "(O)"
+                tempBoard[pos[1]][pos[0]] = "(O)"
                 theval = minimax(tempBoard, action, tokens, ai_tokens, not player1turn, (nply - 1), bad_moves)
-                tempBoard[pos['position'][0]-1][pos['position'][1]] = "( )"
+                tempBoard[pos[1]][pos[0]] = "( )"
                 # min_val = max(min_val, pos[-1]['score'])
-                if (theval[0]['score']) < max_val:
+                if theval[-1]['score'] >= max_val:
                     newPos.clear()
-                    newPos = {'position': (pos['position'][0], pos['position'][1]), 'score': 0}
-                    max_val = theval[0]['score']
+                    newPos = [{'position': ([pos[1]][pos[0]]), 'score': 0}]
+                    max_val = theval[-1]['score']
+
         return newPos

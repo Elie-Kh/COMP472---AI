@@ -1,9 +1,10 @@
 from minmaxAI import summon_ai_overlord
 from win_check import win_check
-from Board import board_game,x_dict,column_letters,move_check
+from Board import board_game, x_dict, column_letters, move_check
 
 
 global last_act
+last_act = [0, 0]
 
 # Variables below are used in the function
 # p_play variables are for getting user input
@@ -85,7 +86,6 @@ while moves != 30 and win is False:
                 if validMove is True:
                     play_x = checker[0]
                     play_y = checker[1]
-                    global last_act
                     last_act = [play_x, play_y]
         if mover is True:
             confirm = input('Are you sure you want to move your token? Enter Y or N').upper()
