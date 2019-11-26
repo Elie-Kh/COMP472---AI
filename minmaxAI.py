@@ -169,20 +169,25 @@ def evaluate_potential(board, target):
 # get_possible_token_locations returns a list of possible location for the next token placement/move
 def get_possible_token_locations(potential):
     potential_locations = []
+    potential_score = []
     for spot in ['tl', 'tr', 'bl', 'br']:
         if not potential[spot]:
             if spot == 'tl':
                 potential_locations.append((potential['position'][0] - 1, potential['position'][1] - 1))
+                potential_score.append(potential['score'])
             if spot == 'tr':
                 potential_locations.append((potential['position'][0] + 1, potential['position'][1] - 1))
+                potential_score.append(potential['score'])
             if spot == 'bl':
                 potential_locations.append((potential['position'][0] - 1, potential['position'][1] + 1))
+                potential_score.append(potential['score'])
             if spot == 'br':
                 potential_locations.append((potential['position'][0] + 1, potential['position'][1] + 1))
+                potential_score.append(potential['score'])
     if len(potential_locations) == 0:
         global noGood
         noGood = True
-    return potential_locations
+    return potential_locations, potential_score
 
 
 # get_ai_token evaluates the board and returns the where the AI will place its token
@@ -240,17 +245,17 @@ def summon_ai_overlord(board, p1_turn, player_tokens, ai_tokens, lastAction, cou
 # if tokens <= 0:
         # return get_ai_move(board, target, counter)
     # return get_ai_token(board, target, counter)
-    val = minimax(board, lastAction, player_tokens, ai_tokens, p1_turn, counter, bad_moves)
-    return val[0]['position']
+    val = minimax(board, lastAction, -10, player_tokens, ai_tokens, p1_turn, counter, bad_moves)
+    return val['position']
 
 
-def minimax(board, lastAction, player_tokens, ai_tokens, player1turn, nply, bad_moves):
+def minimax(board, lastAction, lastScore, player_tokens, ai_tokens, player1turn, nply, bad_moves):
     if player1turn:
         target = ("(X)", "(O)")
     else:
         target = ("(O)", "(X)")
     if nply == 0 or win_check(board, player1turn) == True:
-        return lastAction
+        return {'position': lastAction, 'score': lastScore}
     actions = evaluate_potential(board, target)
     action = get_possible_token_locations(actions[-1])
     tempBoard = copy.deepcopy(board)
@@ -269,15 +274,17 @@ def minimax(board, lastAction, player_tokens, ai_tokens, player1turn, nply, bad_
             # newPos.append({'position': (0, 0), 'score': 0})
             # action = get_ai_token(board, target, bad_moves)
             tokens = player_tokens - 1
-            for pos in action:
-                tempBoard[[pos[1]][pos[0]]] = "(X)"
-                theval = minimax(tempBoard, pos['position'], tokens, ai_tokens, not player1turn, (nply - 1), bad_moves)
-                tempBoard[[pos[1]][pos[0]]] = "( )"
+            iters = 0
+            for pos in action[0]:
+                tempBoard[pos[1]][pos[0]] = "(X)"
+                theval = minimax(tempBoard, pos, action[1][iters], tokens, ai_tokens, not player1turn, (nply - 1), bad_moves)
+                tempBoard[pos[1]][pos[0]] = "( )"
                 # min_val = max(min_val, pos[-1]['score'])
-                if theval[0]['score'] <= min_val:
+                if theval['score'] <= min_val:
                     newPos.clear()
-                    newPos = [{'position': ([pos[1]][pos[0]]), 'score': 0}]
-                    min_val = theval[0]['score']
+                    newPos = theval
+                    min_val = theval['score']
+                iters+=1
         return newPos
 
     else:
@@ -289,17 +296,18 @@ def minimax(board, lastAction, player_tokens, ai_tokens, player1turn, nply, bad_
             tokens = ai_tokens
 
         else:
-
+            iters = 0
             # action = get_ai_token(board, target, bad_moves)
             tokens = ai_tokens - 1
-            for pos in action:
+            for pos in action[0]:
                 tempBoard[pos[1]][pos[0]] = "(O)"
-                theval = minimax(tempBoard, action, tokens, ai_tokens, not player1turn, (nply - 1), bad_moves)
+                theval = minimax(tempBoard, pos, action[1][iters], tokens, ai_tokens, not player1turn, (nply - 1), bad_moves)
                 tempBoard[pos[1]][pos[0]] = "( )"
                 # min_val = max(min_val, pos[-1]['score'])
-                if theval[-1]['score'] >= max_val:
+                if theval['score'] >= max_val:
                     newPos.clear()
-                    newPos = [{'position': ([pos[1]][pos[0]]), 'score': 0}]
-                    max_val = theval[-1]['score']
+                    newPos = theval
+                    max_val = theval['score']
+                iters+=1
 
         return newPos
